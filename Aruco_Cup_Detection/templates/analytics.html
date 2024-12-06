@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='analytics.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="navbar-brand">Realtime Detection</h1>
+            <ul class="navbar-menu">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('analytics') }}">Analytics</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <h3 align="center">Detected Objects Statistics</h3>
+
+    <div class="analytics-container">
+        {% if aruco_data_count == 0 and cup_data_count == 0 %}
+        <div class="nothing-to-display">
+            <h6>No statistical data available at this time</h6>
+        </div>
+        {% else %}
+        {% if aruco_data_count > 0 %}</div><div align="center">
+        <h4 align="center">ArUco Count Data</h4>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Datetime</th>
+                    <th>Frame Index</th>
+                    <th>ArUco Count</th>
+                    <th>ArUco IDs</th>
+                    <th>Clip</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in aruco_data %}
+                <tr>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td><a href="{{ url_for('download_clip', filename='violation_clip_' ~ row[2] ~ '.mp4') }}">Download</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+</div><div align="center">
+        {% if cup_data_count > 0 %}
+        <h4 align="center">Cup Count Data</h4>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Datetime</th>
+                    <th>Frame Index</th>
+                    <th>Cup Count</th>
+                    <th>Aruco Count</th>
+                    <th>Clip</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in cup_data %}
+                <tr>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td><a href="{{ url_for('download_clip', filename='violation_clip_' ~ row[2] ~ '.mp4') }}">Download</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <h3 align="center">Chart</h3>
+
+    <div class="chart-container">
+        {% if aruco_data_count == 0 and cup_data_count == 0 %}
+        <div class="nothing-to-display">
+            <h6>No chart data available at this time</h6>
+        </div>
+        {% else %}
+        <div id="chart"></div>
+        {% endif %}
+    </div>
+
+    <h3 align="center">Download Reports</h3>
+
+    <div class="download-container">
+        <a href="/download/csv" style="margin-right: 8px;">Download CSV</a>
+        <a href="/download/excel" style="margin-right: 8px;">Download Excel</a>
+        <a href="/download/pdf">Download PDF</a>
+    </div>
+
+    <script>
+        fetch('/analytics/data')
+            .then(response => response.json())
+            .then(data => {
+                const timestamps = data.map(item => item[1]);
+                const cupCounts = data.map(item => item[3]);
+                const arucoCounts = data.map(item => item[4]);
+
+                const plotData = [
+                    {
+                        x: timestamps,
+                        y: cupCounts,
+                        type: 'bar',
+                        name: 'Cup Count',
+                        marker: {
+                            color: '#9147ff'
+                        }
+                    },
+                    {
+                        x: timestamps,
+                        y: arucoCounts,
+                        type: 'bar',
+                        name: 'ArUco Count',
+                        marker: {
+                            color: '#ff9147'
+                        }
+                    }
+                ];
+
+                Plotly.newPlot('chart', plotData);
+            });
+    </script>
+</body>
+</html>
