@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Analytics</h2>
+    <div class="mt-4">
+        <h3>Region 1</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Direction</th>
+                    <th>Count</th>
+                    <th>Class</th>
+                </tr>
+            </thead>
+            <tbody id="region1-table-body">
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div><br>
+    <div class="mt-4">
+        <h3>Region 2</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Direction</th>
+                    <th>Count</th>
+                    <th>Class</th>
+                </tr>
+            </thead>
+            <tbody id="region2-table-body">
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div><br>
+    <div class="mt-4">
+        <h3>Region 3</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Direction</th>
+                    <th>Count</th>
+                    <th>Class</th>
+                </tr>
+            </thead>
+            <tbody id="region3-table-body">
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div><br><center>
+    <div class="mt-4">
+        <a href="/download/csv" class="btn btn-primary">Download CSV</a>
+        <a href="/download/excel" class="btn btn-primary">Download Excel</a>
+        <a href="/download/pdf" class="btn btn-primary">Download PDF</a>
+        <a href="/download/video" class="btn btn-primary">Download Video</a>
+    </div></center>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.getJSON('/analytics/data', function(data) {
+            data.forEach(function(row, index) {
+                var rowHtml = '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + row[1] + '</td>' +
+                    '<td>' + row[2] + '</td>' +
+                    '<td>' + row[3] + '</td>' +
+                    '<td>' + row[4] + '</td>' +
+                    '</tr>';
+
+                if (row[0] == 1) {
+                    $('#region1-table-body').append(rowHtml);
+                } else if (row[0] == 2) {
+                    $('#region2-table-body').append(rowHtml);
+                } else if (row[0] == 3) {
+                    $('#region3-table-body').append(rowHtml);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
